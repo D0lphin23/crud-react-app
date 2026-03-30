@@ -1,5 +1,4 @@
 import { Component } from "react";
-import nextId from "react-id-generator";
 import AppInfo from "../app-info/app-info";
 import SearchPanel from "../search-panel/search-panel";
 import AppFilter from "../app-filter/app-filter";
@@ -12,12 +11,30 @@ class App extends Component {
         super(props);
         this.state = {
             data: [
-                { id: 1, name: "John Shepard", salary: 800 },
-                { id: 2, name: "Egor Gorelik", salary: 1200 },
-                { id: 3, name: "Eren Yeager", salary: 500 },
+                {
+                    id: 1,
+                    name: "John Shepard",
+                    increase: false,
+                    rise: false,
+                    salary: 800,
+                },
+                {
+                    id: 2,
+                    name: "Egor Gorelik",
+                    increase: true,
+                    rise: true,
+                    salary: 1200,
+                },
+                {
+                    id: 3,
+                    name: "Eren Yeager",
+                    increase: false,
+                    rise: false,
+                    salary: 500,
+                },
             ],
         };
-        this.nextId = nextId;
+        this.nextId = 4;
     }
 
     deleteItem = (id) => {
@@ -30,9 +47,11 @@ class App extends Component {
 
     addItem = (name, salary) => {
         const newItem = {
-            id: this.nextId(),
+            id: this.nextId++,
             name,
             salary,
+            increase: false,
+            rise: false,
         };
 
         this.setState(({ data }) => {
@@ -43,18 +62,34 @@ class App extends Component {
         });
     };
 
+    onToggleProp = (id, prop) => {
+        this.setState(({ data }) => ({
+            data: data.map((item) => {
+                if (item.id === id) {
+                    return { ...item, [prop]: !item[prop] };
+                }
+                return item;
+            }),
+        }));
+    };
+
     render() {
         const { data } = this.state;
+        const increased = data.filter((item) => item.increase);
 
         return (
             <div className="app">
-                <AppInfo />
+                <AppInfo employees={data.length} increased={increased.length} />
 
                 <div className="search-panel">
                     <SearchPanel />
                     <AppFilter />
                 </div>
-                <EmployeesList data={data} onDelete={this.deleteItem} />
+                <EmployeesList
+                    data={data}
+                    onDelete={this.deleteItem}
+                    onToggleProp={this.onToggleProp}
+                />
                 <EmployeeAddForm onAdd={this.addItem} />
             </div>
         );
